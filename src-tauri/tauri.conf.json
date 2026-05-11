@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Lucem",
-  "version": "0.1.0",
-  "identifier": "com.lucem.dev",
+  "productName": "linuxstrap",
+  "version": "0.0.1",
+  "identifier": "org.linuxstrap.dev",
   "build": {
     "frontendDist": "../src"
   },
