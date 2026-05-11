@@ -50,10 +50,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ env.VERSION }}
-          name: linuxstrap v${{ env.VERSION }}
-          body: 'Automated release of linuxstrap v${{ env.VERSION }}. See the assets below to download and install.'
+          name: Lucem v${{ env.VERSION }}
+          body: 'Automated release of Lucem v${{ env.VERSION }}. See the changelog below.'
           draft: false
           prerelease: false
+          generate_release_notes: true
           files: |
             src-tauri/target/release/bundle/deb/*.deb
             src-tauri/target/release/bundle/appimage/*.AppImage
