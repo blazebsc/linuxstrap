@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Lucem</title>
+    <script type="module" src="/main.js" defer></script>
+  </head>
+  <body>
+    <div id="app">
+      <header class="header-bar">
+        <div class="header-left">
+          <button id="toggle-sidebar" class="icon-btn" title="Toggle Sidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+          </button>
+        </div>
+        <div class="header-title">Lucem</div>
+        <div class="header-right">
+          <button id="btn-store" class="icon-btn" title="Patch Store">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          </button>
+          <button id="btn-play" class="primary-btn" title="Start Sober">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Play
+          </button>
+        </div>
+      </header>
+
+      <div class="main-layout">
+        <aside id="sidebar" class="sidebar">
+          <nav>
+            <button class="nav-item active" data-view="general">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              General Settings
+            </button>
+            <button class="nav-item" data-view="fastflags">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              FastFlags
+            </button>
+            <button class="nav-item" data-view="patches">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              Patches
+            </button>
+          </nav>
+        </aside>
+
+        <main class="content-area">
+          <!-- General Settings View -->
+          <div id="view-general" class="view active">
+            <div class="preferences-group">
+              <h2>General Settings</h2>
+              <p class="description">These settings dictate Lucem's behaviour.</p>
+              
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Sober Settings</h3>
+                  <p>Open the native Sober configuration window.</p>
+                </div>
+                <div class="row-action">
+                  <button id="btn-sober-config" class="secondary-btn" style="padding: 6px 12px;">Open Settings</button>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Close on Leave</h3>
+                  <p>Automatically close Sober when you leave an experience.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-close-on-leave">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Show Discord RPC</h3>
+                  <p>When enabled, Lucem will display the current experience you're playing on Discord.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-rpc">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Discord RPC Join Button</h3>
+                  <p>Display a button on your Discord profile allowing others to join your game.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-rpc-join">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Show Server Location</h3>
+                  <p>Displays an indicator showing the region of your current server.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-server-location">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="preferences-group">
+              <h2>Rendering Parameters</h2>
+              <p class="description">These settings control how rendering is handled by Sober.</p>
+              
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Rendering Backend</h3>
+                  <p>Only modify if you have issues with Vulkan.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-renderer" class="select-input">
+                    <option value="vulkan">Vulkan</option>
+                    <option value="opengl">OpenGL</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Maximum FPS</h3>
+                  <p>If you have VSync enabled, this will be ignored.</p>
+                </div>
+                <div class="row-action">
+                  <input type="number" id="setting-maxfps" class="number-input" min="1" max="999" value="60">
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Enable HiDPI Scaling</h3>
+                  <p>Scale the rendering properly on high-resolution displays.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-hidpi">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="preferences-group">
+              <h2>Advanced Parameters</h2>
+              <p class="description"><b>Do not modify these settings if you aren't aware of what they do.</b></p>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Enable GameMode (FeralMode)</h3>
+                  <p>Request the system to allocate more resources to Roblox.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-gamemode">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Use Console Experience</h3>
+                  <p>Force Roblox to load the Xbox/Console user interface.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-console-exp">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FastFlags View -->
+          <div id="view-fastflags" class="view">
+            <div class="preferences-group">
+              <h2>FastFlags Presets</h2>
+              <p class="description">Easily modify specific engine behaviors hidden from normal users.</p>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Preferred Lighting Technology</h3>
+                  <p>Forces the game to render using a specific lighting engine phase.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-lighting" class="select-input">
+                    <option value="default">Default</option>
+                    <option value="voxel">Voxel (Phase 1)</option>
+                    <option value="shadowmap">Shadowmap (Phase 2)</option>
+                    <option value="future">Future (Phase 3)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Preferred Texture Quality</h3>
+                  <p>Overrides the texture resolution of the game.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-texture" class="select-input">
+                    <option value="default">Default</option>
+                    <option value="0">Level 0 (Potato)</option>
+                    <option value="1">Level 1 (Low)</option>
+                    <option value="2">Level 2 (Medium)</option>
+                    <option value="3">Level 3 (High)</option>
+                    <option value="4">Level 4 (Ultra)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>MSAA (Anti-Aliasing)</h3>
+                  <p>Smooths out jagged edges on 3D models.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-msaa" class="select-input">
+                    <option value="default">Default (Auto)</option>
+                    <option value="off">Off</option>
+                    <option value="1">x1</option>
+                    <option value="2">x2</option>
+                    <option value="4">x4</option>
+                    <option value="8">x8</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Disable Bubble Chat</h3>
+                  <p>Turns off the new bubble chat from chat service entirely.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-bubble-chat">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Disable Player Shadows</h3>
+                  <p>Improves performance by removing rendering shadows for players.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-player-shadows">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                <div class="row-info" style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <h3>Custom FastFlags</h3>
+                    <p>Add specific FFlags overrides here.</p>
+                  </div>
+                  <button id="btn-add-fflag" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Add Flag</button>
+                </div>
+                <div id="custom-fflags-list" style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+                  <!-- JS will populate rows here -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patches View -->
+          <div id="view-patches" class="view">
+            <div class="preferences-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <h2>Patches & Mods</h2>
+                <button id="btn-open-mods" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Open Overlay Folder</button>
+              </div>
+              <p class="description">Manage loaded patches for Sober.</p>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Old Avatar Background</h3>
+                  <p>Restore the old 2014 mobile avatar background.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-old-avatar-bg">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Old Character Sounds</h3>
+                  <p>Restore the old death, jump, and walking sounds (Oof).</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-old-sounds">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Cursor Style</h3>
+                  <p>Change the style of the in-game cursor.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-cursor-type" class="select-input">
+                    <option value="default">Default</option>
+                    <option value="2006">2006 (Retro)</option>
+                    <option value="2013">2013 (Classic)</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div id="patches-list">
+                <div class="empty-state" id="patches-loading">
+                  <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 12px; animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                  <p>Loading patches from the store...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+
+      <!-- Toast Container -->
+      <div id="toast-container"></div>
+    </div>
+  </body>
+</html>
