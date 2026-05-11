@@ -41,13 +41,20 @@ jobs:
           VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Build and Release Tauri app
-        uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri app
+        run: npm run tauri build
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__
-          releaseName: 'linuxstrap v__VERSION__'
-          releaseBody: 'Automated release of linuxstrap. See the assets to download and install.'
-          releaseDraft: false
+          tag_name: v${{ env.VERSION }}
+          name: linuxstrap v${{ env.VERSION }}
+          body: 'Automated release of linuxstrap v${{ env.VERSION }}. See the assets below to download and install.'
+          draft: false
           prerelease: false
+          files: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/rpm/*.rpm
