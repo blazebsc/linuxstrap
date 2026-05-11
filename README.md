@@ -36,7 +36,7 @@ sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchel
 
 ### 2. Clone and Build
 ```bash
-git clone https://github.com/YOUR_USERNAME/linuxstrap.git
+git clone https://github.com/blazebsc/linuxstrap.git
 cd linuxstrap
 
 # Install frontend dependencies
@@ -48,7 +48,6 @@ pnpm run tauri dev
 # Or build for release
 pnpm run tauri build
 ```
-Compiled binaries will be available in the [Github Releases](https://github.com/blazebsc/linuxstrap/releases).
 
 ## License
 
