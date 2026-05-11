@@ -32,7 +32,7 @@ On Debian/Ubuntu-based systems, install the required Tauri build dependencies:
 sudo apt update
 sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 ```
-*(For other distributions, check the [Tauri Prerequisites Guide](https://tauri.app/v1/guides/getting-started/prerequisites/linux/))*
+*(For other distributions, check the [Tauri Prerequisites Guide](https://tauri.app/start/prerequisites/#linux))*
 
 ### 2. Clone and Build
 ```bash

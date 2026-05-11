@@ -77,6 +77,46 @@
 
               <div class="action-row">
                 <div class="row-info">
+                  <h3>Allow Gamepad Permission</h3>
+                  <p>Enables the service to use gamepads or controllers.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-allow-gamepad">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Touch Mode</h3>
+                  <p>Configure touchscreen behaviour and mobile UI.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-touch-mode" class="select-input">
+                    <option value="off">Off (Desktop UI)</option>
+                    <option value="on">On (Mobile UI)</option>
+                    <option value="fake-off">Fake-Off (Desktop UI with Touch)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Use libsecret</h3>
+                  <p>Uses libsecret for storing the session cookie instead of plaintext.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-use-libsecret">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
                   <h3>Show Discord RPC</h3>
                   <p>When enabled, Linuxstrap will display the current experience you're playing on Discord.</p>
                 </div>
@@ -119,6 +159,20 @@
               <h2>Rendering Parameters</h2>
               <p class="description">These settings control how rendering is handled by Sober.</p>
               
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Graphics Optimization Mode</h3>
+                  <p>Changes the fidelity level used by Roblox's rendering engine.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-graphics-optimization" class="select-input">
+                    <option value="quality">Quality (Default)</option>
+                    <option value="balanced">Balanced</option>
+                    <option value="performance">Performance</option>
+                  </select>
+                </div>
+              </div>
+
               <div class="action-row">
                 <div class="row-info">
                   <h3>Rendering Backend</h3>
@@ -275,7 +329,10 @@
                     <h3>Custom FastFlags</h3>
                     <p>Add specific FFlags overrides here.</p>
                   </div>
-                  <button id="btn-add-fflag" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Add Flag</button>
+                  <div>
+                    <button id="btn-import-fflags" class="secondary-btn" style="padding: 4px 10px; font-size: 12px; margin-right: 8px;">Import JSON</button>
+                    <button id="btn-add-fflag" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Add Flag</button>
+                  </div>
                 </div>
                 <div id="custom-fflags-list" style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
                   <!-- JS will populate rows here -->
@@ -329,14 +386,57 @@
                     <option value="default">Default</option>
                     <option value="2006">2006 (Retro)</option>
                     <option value="2013">2013 (Classic)</option>
+                    <option value="custom">Custom (Provide file)</option>
                   </select>
                 </div>
               </div>
-              
-              <div id="patches-list">
+
+              <div class="action-row" id="custom-cursor-row" style="display: none; padding-top: 0; margin-top: -8px;">
+                <div class="row-info" style="margin-left: 20px;">
+                  <p>Select your custom cursor file (.png)</p>
+                </div>
+                <div class="row-action">
+                  <button id="btn-pick-cursor" class="secondary-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 8px;">Browse</button>
+                  <span id="label-cursor-path" style="font-size: 11px; opacity: 0.7; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No file</span>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Custom Font</h3>
+                  <p>Overrides all game fonts.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-font-type" class="select-input">
+                    <option value="default">Default</option>
+                    <option value="custom">Custom (Provide file)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="action-row" id="custom-font-row" style="display: none; padding-top: 0; margin-top: -8px;">
+                <div class="row-info" style="margin-left: 20px;">
+                  <p>Select your custom font file (.ttf)</p>
+                </div>
+                <div class="row-action">
+                  <button id="btn-pick-font" class="secondary-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 8px;">Browse</button>
+                  <span id="label-font-path" style="font-size: 11px; opacity: 0.7; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No file</span>
+                </div>
+              </div>
+
+              <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
+
+              <!-- Mod sources tabs -->
+              <div class="tabs" style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <button id="tab-installed" class="secondary-btn active-tab" style="padding: 6px 12px; font-size: 12px; background: rgba(255,255,255,0.2);">Installed</button>
+                <button id="tab-gamebanana" class="secondary-btn" style="padding: 6px 12px; font-size: 12px;">GameBanana</button>
+                <button id="tab-fishstrap" class="secondary-btn" style="padding: 6px 12px; font-size: 12px;">Fishstrap</button>
+              </div>
+
+              <div id="mods-content-area">
                 <div class="empty-state" id="patches-loading">
                   <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 12px; animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-                  <p>Loading patches from the store...</p>
+                  <p>Loading installed mods...</p>
                 </div>
               </div>
             </div>

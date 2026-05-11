@@ -4,7 +4,6 @@ const { invoke } = window.__TAURI__.core;
 let config = {
   discordRpc: true,
   discordRpcJoinButton: true,
-  maxFps: 60,
   patches: [],
   renderer: "vulkan",
   closeOnLeave: false,
@@ -20,6 +19,9 @@ let config = {
   useOldAvatarBackground: false,
   useOldCharacterSounds: false,
   cursorType: "default",
+  customCursorPath: "",
+  fontType: "default",
+  customFontPath: "",
   customFflags: {}
 };
 
@@ -37,13 +39,18 @@ const btnSoberConfig = document.getElementById("btn-sober-config");
 // Settings Elements
 const rpcSwitch = document.getElementById("setting-rpc");
 const rendererSelect = document.getElementById("setting-renderer");
-const maxFpsInput = document.getElementById("setting-maxfps");
 const closeOnLeaveSwitch = document.getElementById("setting-close-on-leave");
 const rpcJoinSwitch = document.getElementById("setting-rpc-join");
 const serverLocationSwitch = document.getElementById("setting-server-location");
 const hidpiSwitch = document.getElementById("setting-hidpi");
 const gamemodeSwitch = document.getElementById("setting-gamemode");
 const consoleExpSwitch = document.getElementById("setting-console-exp");
+
+// New Sober Elements
+const allowGamepadSwitch = document.getElementById("setting-allow-gamepad");
+const touchModeSelect = document.getElementById("setting-touch-mode");
+const useLibsecretSwitch = document.getElementById("setting-use-libsecret");
+const graphicsOptSelect = document.getElementById("setting-graphics-optimization");
 
 const lightingSelect = document.getElementById("setting-lighting");
 const textureSelect = document.getElementById("setting-texture");
@@ -54,8 +61,18 @@ const playerShadowsSwitch = document.getElementById("setting-player-shadows");
 const oldAvatarBgSwitch = document.getElementById("setting-old-avatar-bg");
 const oldSoundsSwitch = document.getElementById("setting-old-sounds");
 const cursorTypeSelect = document.getElementById("setting-cursor-type");
+const fontTypeSelect = document.getElementById("setting-font-type");
+
+const customCursorRow = document.getElementById("custom-cursor-row");
+const btnPickCursor = document.getElementById("btn-pick-cursor");
+const labelCursorPath = document.getElementById("label-cursor-path");
+
+const customFontRow = document.getElementById("custom-font-row");
+const btnPickFont = document.getElementById("btn-pick-font");
+const labelFontPath = document.getElementById("label-font-path");
 
 const btnAddFflag = document.getElementById("btn-add-fflag");
+const btnImportFflags = document.getElementById("btn-import-fflags");
 
 async function loadConfig() {
   try {
@@ -65,12 +82,17 @@ async function loadConfig() {
     rpcSwitch.checked = config.discordRpc;
     rpcJoinSwitch.checked = config.discordRpcJoinButton;
     rendererSelect.value = config.renderer || "vulkan";
-    maxFpsInput.value = config.maxFps || 60;
     closeOnLeaveSwitch.checked = config.closeOnLeave;
     serverLocationSwitch.checked = config.serverLocationIndicator;
     hidpiSwitch.checked = config.enableHidpi;
     gamemodeSwitch.checked = config.enableGamemode;
     consoleExpSwitch.checked = config.useConsoleExperience;
+
+    allowGamepadSwitch.checked = config.allowGamepadPermission;
+    touchModeSelect.value = config.touchMode || "off";
+    useLibsecretSwitch.checked = config.useLibsecret;
+    graphicsOptSelect.value = config.graphicsOptimizationMode || "quality";
+
     lightingSelect.value = config.lightingTechnology || "default";
     textureSelect.value = config.textureQuality || "default";
     msaaSelect.value = config.msaa || "default";
@@ -80,7 +102,12 @@ async function loadConfig() {
     oldAvatarBgSwitch.checked = config.useOldAvatarBackground;
     oldSoundsSwitch.checked = config.useOldCharacterSounds;
     cursorTypeSelect.value = config.cursorType || "default";
+    fontTypeSelect.value = config.fontType || "default";
 
+    labelCursorPath.innerText = config.customCursorPath ? config.customCursorPath.split('/').pop() : "No file";
+    labelFontPath.innerText = config.customFontPath ? config.customFontPath.split('/').pop() : "No file";
+
+    updateVisibility();
     renderCustomFflags();
   } catch (error) {
     console.error("Failed to load config:", error);
@@ -93,6 +120,11 @@ async function saveConfig() {
   } catch (error) {
     console.error("Failed to save config:", error);
   }
+}
+
+function updateVisibility() {
+  customCursorRow.style.display = config.cursorType === "custom" ? "flex" : "none";
+  customFontRow.style.display = config.fontType === "custom" ? "flex" : "none";
 }
 
 // Event Listeners
@@ -154,6 +186,26 @@ window.addEventListener("DOMContentLoaded", () => {
     saveConfig();
   });
 
+  allowGamepadSwitch.addEventListener("change", (e) => {
+    config.allowGamepadPermission = e.target.checked;
+    saveConfig();
+  });
+
+  touchModeSelect.addEventListener("change", (e) => {
+    config.touchMode = e.target.value;
+    saveConfig();
+  });
+
+  useLibsecretSwitch.addEventListener("change", (e) => {
+    config.useLibsecret = e.target.checked;
+    saveConfig();
+  });
+
+  graphicsOptSelect.addEventListener("change", (e) => {
+    config.graphicsOptimizationMode = e.target.value;
+    saveConfig();
+  });
+
   rendererSelect.addEventListener("change", (e) => {
     config.renderer = e.target.value;
     saveConfig();
@@ -196,12 +248,74 @@ window.addEventListener("DOMContentLoaded", () => {
 
   cursorTypeSelect.addEventListener("change", (e) => {
     config.cursorType = e.target.value;
+    updateVisibility();
     saveConfig();
+  });
+
+  fontTypeSelect.addEventListener("change", (e) => {
+    config.fontType = e.target.value;
+    updateVisibility();
+    saveConfig();
+  });
+
+  const { open } = window.__TAURI__.plugin_dialog || window.__TAURI__.dialog;
+
+  btnPickCursor.addEventListener("click", async () => {
+    try {
+      const selected = await window.__TAURI__.plugin_dialog.open({
+        multiple: false,
+        filters: [{ name: 'Image', extensions: ['png'] }]
+      });
+      if (selected) {
+        config.customCursorPath = selected;
+        labelCursorPath.innerText = selected.split('/').pop() || selected.split('\\').pop();
+        saveConfig();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
+  btnPickFont.addEventListener("click", async () => {
+    try {
+      const selected = await window.__TAURI__.plugin_dialog.open({
+        multiple: false,
+        filters: [{ name: 'Font', extensions: ['ttf', 'otf'] }]
+      });
+      if (selected) {
+        config.customFontPath = selected;
+        labelFontPath.innerText = selected.split('/').pop() || selected.split('\\').pop();
+        saveConfig();
+      }
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   // Custom FFlags Logic
   btnAddFflag.addEventListener("click", () => {
     createFflagRow("", "");
+  });
+
+  btnImportFflags.addEventListener("click", async () => {
+    try {
+      const selected = await window.__TAURI__.plugin_dialog.open({
+        multiple: false,
+        filters: [{ name: 'JSON', extensions: ['json'] }]
+      });
+      if (selected) {
+        // Read file contents (Tauri v2 doesn't have an easy fs read from JS without plugin, so we can use a new backend command)
+        const newFlags = await invoke("import_fflags_json", { path: selected });
+        // merge into config
+        config.customFflags = { ...config.customFflags, ...newFlags };
+        renderCustomFflags();
+        saveConfig();
+        showToast("Imported FastFlags successfully.");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Failed to import: " + e, true);
+    }
   });
 
   // Launch Sober
@@ -302,9 +416,19 @@ function createFflagRow(key = "", value = "") {
   let debounceTimeout;
   const saveRowChange = () => {
     clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(() => {
+    debounceTimeout = setTimeout(async () => {
       saveCustomFflagsFromUI();
-    }, 500);
+      if (keyInput.value.trim().length > 0) {
+        try {
+          const isValid = await invoke("validate_fflag", { flag: keyInput.value.trim() });
+          if (!isValid) {
+            showToast(`Warning: ${keyInput.value.trim()} is not in the public tracker. Use at your own risk.`, true);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }, 1000);
   };
   
   keyInput.addEventListener("input", saveRowChange);
@@ -359,54 +483,109 @@ function saveCustomFflagsFromUI() {
 }
 
 // Patch Store System
+let currentModsView = 'installed';
+let gamebananaPage = 1;
+let cachedFishstrapMods = [];
+let cachedGamebananaMods = [];
+let allLoadedMods = []; // Combined cache for lookups
+
 async function loadPatches() {
-  const listEl = document.getElementById("patches-list");
+  const listEl = document.getElementById("mods-content-area");
+  
+  listEl.innerHTML = `
+    <div class="empty-state">
+      <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 12px; animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+      <p>Loading...</p>
+    </div>
+  `;
+
   try {
-    const patches = await invoke("fetch_patch_index");
+    let modsToDisplay = [];
+
+    if (currentModsView === 'installed') {
+      // Installed mods are fetched from config.patches array, but we need details.
+      // We will try to find them in our cache, or create basic info.
+      for (const patchKey of config.patches) {
+        let [source, id] = patchKey.split(":");
+        // Try to find in cache
+        let found = allLoadedMods.find(m => m.source === source && m.id === id);
+        if (found) {
+          modsToDisplay.push(found);
+        } else {
+          modsToDisplay.push({
+            id: id,
+            title: `${source} Mod (${id})`,
+            author: "Unknown",
+            source: source,
+            image_url: null
+          });
+        }
+      }
+    } else if (currentModsView === 'gamebanana') {
+      if (cachedGamebananaMods.length === 0) {
+        cachedGamebananaMods = await invoke("fetch_gamebanana_mods", { page: gamebananaPage });
+        allLoadedMods = [...allLoadedMods, ...cachedGamebananaMods];
+      }
+      modsToDisplay = cachedGamebananaMods;
+    } else if (currentModsView === 'fishstrap') {
+      if (cachedFishstrapMods.length === 0) {
+        cachedFishstrapMods = await invoke("fetch_fishstrap_mods");
+        allLoadedMods = [...allLoadedMods, ...cachedFishstrapMods];
+      }
+      modsToDisplay = cachedFishstrapMods;
+    }
     
     listEl.innerHTML = "";
     
-    if (patches.length === 0) {
+    if (modsToDisplay.length === 0) {
       listEl.innerHTML = `
         <div class="empty-state">
-          <p>No patches available in the store right now.</p>
+          <p>No mods found.</p>
         </div>
       `;
       return;
     }
 
-    patches.forEach(patch => {
-      const isInstalled = config.patches.includes(patch.url);
+    modsToDisplay.forEach(mod => {
+      const patchKey = `${mod.source}:${mod.id}`;
+      const isInstalled = config.patches.includes(patchKey);
       
       const item = document.createElement("div");
       item.className = "patch-item";
       
       item.innerHTML = `
-        <div class="patch-info">
-          <h3>${patch.title}</h3>
-          <p>${patch.url}</p>
-        </div>
-        <div class="patch-action">
-          <button class="${isInstalled ? 'secondary-btn' : 'primary-btn'} patch-btn" data-url="${patch.url}">
-            ${isInstalled ? 'Uninstall' : 'Install'}
-          </button>
+        <div style="display: flex; gap: 12px; align-items: center; width: 100%;">
+          <div style="width: 48px; height: 48px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.05); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+            ${mod.image_url ? `<img src="${mod.image_url}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">` : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'}
+          </div>
+          <div class="patch-info" style="flex-grow: 1;">
+            <h3 style="margin: 0; font-size: 14px;">${mod.title}</h3>
+            <p style="margin: 2px 0 0 0; font-size: 11px; opacity: 0.7;">By ${mod.author} • ${mod.source}</p>
+          </div>
+          <div class="patch-action" style="flex-shrink: 0;">
+            <button class="${isInstalled ? 'secondary-btn' : 'primary-btn'} patch-btn" data-id="${mod.id}" data-source="${mod.source}">
+              ${isInstalled ? 'Uninstall' : 'Install'}
+            </button>
+          </div>
         </div>
       `;
       
       const btn = item.querySelector(".patch-btn");
       btn.addEventListener("click", async () => {
-        const url = btn.getAttribute("data-url");
+        const id = btn.getAttribute("data-id");
+        const source = btn.getAttribute("data-source");
+        const key = `${source}:${id}`;
         
         btn.disabled = true;
         btn.textContent = isInstalled ? "Uninstalling..." : "Installing...";
         
         try {
           if (isInstalled) {
-            await invoke("uninstall_patch", { url });
-            showToast(`Uninstalled ${patch.title}`);
+            await invoke("uninstall_mod", { id, source });
+            showToast(`Uninstalled ${mod.title}`);
           } else {
-            await invoke("install_patch", { url });
-            showToast(`Installed ${patch.title}`);
+            await invoke("install_mod", { id, source });
+            showToast(`Installed ${mod.title}`);
           }
           // Reload config to sync states and re-render
           await loadConfig();
@@ -424,10 +603,31 @@ async function loadPatches() {
   } catch (e) {
     listEl.innerHTML = `
       <div class="empty-state" style="color: #e06c75;">
-        <p>Failed to load patch store.</p>
+        <p>Failed to load mods.</p>
         <p style="font-size: 12px; margin-top: 8px;">${e}</p>
       </div>
     `;
   }
 }
+
+document.getElementById("tab-installed").addEventListener("click", (e) => {
+  document.querySelectorAll(".tabs button").forEach(b => b.style.background = "");
+  e.target.style.background = "rgba(255,255,255,0.2)";
+  currentModsView = 'installed';
+  loadPatches();
+});
+
+document.getElementById("tab-gamebanana").addEventListener("click", (e) => {
+  document.querySelectorAll(".tabs button").forEach(b => b.style.background = "");
+  e.target.style.background = "rgba(255,255,255,0.2)";
+  currentModsView = 'gamebanana';
+  loadPatches();
+});
+
+document.getElementById("tab-fishstrap").addEventListener("click", (e) => {
+  document.querySelectorAll(".tabs button").forEach(b => b.style.background = "");
+  e.target.style.background = "rgba(255,255,255,0.2)";
+  currentModsView = 'fishstrap';
+  loadPatches();
+});
 
