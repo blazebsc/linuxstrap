@@ -51,7 +51,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           name: Lucem v${{ env.VERSION }}
-          body: 'Automated release of Lucem v${{ env.VERSION }}. See the changelog below.'
+          body: 'Automated release of linuxstrap v${{ env.VERSION }}. See the changelog below.'
           draft: false
           prerelease: false
           generate_release_notes: true
