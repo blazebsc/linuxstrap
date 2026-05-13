@@ -42,6 +42,10 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
               Patches
             </button>
+            <button class="nav-item" data-view="troubleshooting">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              Troubleshooting
+            </button>
           </nav>
         </aside>
 
@@ -59,6 +63,8 @@
                 </div>
                 <div class="row-action">
                   <button id="btn-sober-config" class="secondary-btn" style="padding: 6px 12px;">Open Settings</button>
+                  <button id="btn-kill-sober-sidebar" class="secondary-btn" style="padding: 6px 12px; margin-left: 8px;">Kill Sober</button>
+                  <button id="btn-reset-sober" class="secondary-btn" style="padding: 6px 12px; margin-left: 8px;">Reset Config</button>
                 </div>
               </div>
 
@@ -138,6 +144,36 @@
                     <input type="checkbox" id="setting-rpc-join">
                     <span class="slider"></span>
                   </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>App Theme Color</h3>
+                  <p>Customize the accent color of the app and Roblox icons.</p>
+                </div>
+                <div class="row-action" style="display: flex; align-items: center; gap: 8px;">
+                  <div id="theme-presets" style="display: flex; gap: 4px;">
+                    <button class="preset-btn active" data-color="#e74c3c" data-preset="red" style="width: 24px; height: 24px; border-radius: 50%; background: #e74c3c; border: 2px solid transparent; cursor: pointer;"></button>
+                    <button class="preset-btn" data-color="#3498db" data-preset="blue" style="width: 24px; height: 24px; border-radius: 50%; background: #3498db; border: 2px solid transparent; cursor: pointer;"></button>
+                    <button class="preset-btn" data-color="#2ecc71" data-preset="green" style="width: 24px; height: 24px; border-radius: 50%; background: #2ecc71; border: 2px solid transparent; cursor: pointer;"></button>
+                    <button class="preset-btn" data-color="#e91e63" data-preset="pink" style="width: 24px; height: 24px; border-radius: 50%; background: #e91e63; border: 2px solid transparent; cursor: pointer;"></button>
+                    <button class="preset-btn" data-color="#9b59b6" data-preset="purple" style="width: 24px; height: 24px; border-radius: 50%; background: #9b59b6; border: 2px solid transparent; cursor: pointer;"></button>
+                    <button class="preset-btn" data-color="#e67e22" data-preset="orange" style="width: 24px; height: 24px; border-radius: 50%; background: #e67e22; border: 2px solid transparent; cursor: pointer;"></button>
+                    <button class="preset-btn" data-color="#1abc9c" data-preset="teal" style="width: 24px; height: 24px; border-radius: 50%; background: #1abc9c; border: 2px solid transparent; cursor: pointer;"></button>
+                  </div>
+                  <input type="color" id="setting-theme-color" value="#e74c3c" style="width: 28px; height: 28px; border: 1px solid var(--border-color); border-radius: 4px; padding: 0; cursor: pointer; -webkit-appearance: none;" title="Custom color">
+                  <button id="btn-generate-theme" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Apply Theme</button>
+                </div>
+              </div>
+
+              <div id="theme-progress-container" style="display: none; padding: 12px 16px; background: var(--bg-row); margin-bottom: 2px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span id="theme-progress-text" style="font-size: 12px; color: var(--text-secondary);">Initializing...</span>
+                  <span id="theme-progress-percent" style="font-size: 12px; color: var(--text-secondary);">0%</span>
+                </div>
+                <div style="height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden;">
+                  <div id="theme-progress-bar" style="height: 100%; background: var(--accent-color); width: 0%; transition: width 0.2s ease;"></div>
                 </div>
               </div>
 
@@ -275,7 +311,6 @@
                     <option value="1">Level 1 (Low)</option>
                     <option value="2">Level 2 (Medium)</option>
                     <option value="3">Level 3 (High)</option>
-                    <option value="4">Level 4 (Ultra)</option>
                   </select>
                 </div>
               </div>
@@ -323,9 +358,65 @@
                 </div>
               </div>
 
-              <div class="action-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-                <div class="row-info" style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                  <div>
+              <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
+
+              <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Tuxstrap Performance</h3>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Super Performance Mode</h3>
+                  <p>Maximum graphics reduction for better FPS.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-super-performance">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Network Optimization</h3>
+                  <p>Improves network performance (experimental).</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-network-optimization">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Wayland Clipboard</h3>
+                  <p>Enables clipboard control on Wayland.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-wayland-clipboard">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Bring Back OOF Sound</h3>
+                  <p>Legacy jump sound effect.</p>
+                </div>
+                <div class="row-action">
+                  <label class="switch">
+                    <input type="checkbox" id="setting-bring-back-oof">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="action-row" style="flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 20px;">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                  <div class="row-info">
                     <h3>Custom FastFlags</h3>
                     <p>Add specific FFlags overrides here.</p>
                   </div>
@@ -409,17 +500,19 @@
                 <div class="row-action">
                   <select id="setting-font-type" class="select-input">
                     <option value="default">Default</option>
-                    <option value="custom">Custom (Provide file)</option>
+                    <option value="custom">Custom (Provide file/folder)</option>
                   </select>
                 </div>
               </div>
 
               <div class="action-row" id="custom-font-row" style="display: none; padding-top: 0; margin-top: -8px;">
                 <div class="row-info" style="margin-left: 20px;">
-                  <p>Select your custom font file (.ttf)</p>
+                  <p>Select font file (.ttf/.otf) or folder with fonts. Use the Recolor button to apply color.</p>
                 </div>
                 <div class="row-action">
-                  <button id="btn-pick-font" class="secondary-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 8px;">Browse</button>
+                  <button id="btn-pick-font-file" class="secondary-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 4px;">Browse File</button>
+                  <button id="btn-pick-font-folder" class="secondary-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 8px;">Browse Folder</button>
+                  <button id="btn-recolor-font" class="secondary-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 8px;">Recolor</button>
                   <span id="label-font-path" style="font-size: 11px; opacity: 0.7; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No file</span>
                 </div>
               </div>
@@ -442,11 +535,167 @@
             </div>
           </div>
 
+          <!-- Troubleshooting View -->
+          <div id="view-troubleshooting" class="view">
+            <div class="preferences-group">
+              <h2>Troubleshooting</h2>
+              <p class="description">Fix common issues with Sober.</p>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Zombie Processes</h3>
+                  <p>Kill lingering Sober processes if the app didn't close properly.</p>
+                </div>
+                <div class="row-action">
+                  <button id="btn-kill-sober" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Kill Sober</button>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Wake GPU (NVIDIA)</h3>
+                  <p>Runs <code>vkcube</code> to wake discrete GPU before launching.</p>
+                </div>
+                <div class="row-action">
+                  <button id="btn-wake-gpu" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Wake GPU</button>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Fix XDG Portals</h3>
+                  <p>Fixes Roblox link joining on some desktop environments.</p>
+                </div>
+                <div class="row-action">
+                  <button id="btn-xdg-portal" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Fix Portals</button>
+                </div>
+              </div>
+
+              <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
+
+              <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">System Checks</h3>
+
+              <div id="system-checks" style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="action-row" style="background: var(--bg-row); border-radius: 6px; padding: 10px 14px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="check-sse42" style="font-size: 16px;">...</span>
+                    <div>
+                      <p style="margin: 0; font-size: 13px; font-weight: 500;">SSE4.2 Support</p>
+                      <p style="margin: 0; font-size: 11px; opacity: 0.6;">Required for Roblox. Intel 2008+, AMD 2013+.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="action-row" style="background: var(--bg-row); border-radius: 6px; padding: 10px 14px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="check-sober-running" style="font-size: 16px;">...</span>
+                    <div>
+                      <p style="margin: 0; font-size: 13px; font-weight: 500;">Sober Status</p>
+                      <p id="check-sober-msg" style="margin: 0; font-size: 11px; opacity: 0.6;">Checking...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
+
+              <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Audio Driver</h3>
+
+              <div class="action-row">
+                <div class="row-info">
+                  <h3>Audio Backend</h3>
+                  <p>Switch between PulseAudio (default), PipeWire, or ALSA.</p>
+                </div>
+                <div class="row-action">
+                  <select id="setting-audio-driver" class="select-input">
+                    <option value="default">Default (PulseAudio)</option>
+                    <option value="pipewire">PipeWire</option>
+                    <option value="alsa">ALSA</option>
+                  </select>
+                </div>
+              </div>
+
+              <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
+
+              <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--text-secondary);">Common Issues</h3>
+
+              <div class="known-issues">
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Out of Memory (RBXCRASH)</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Problem:</b> Your GPU ran out of VRAM. Common on NVIDIA without shared VRAM spillover.</p>
+                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Set Texture Quality override to Level 1 or lower in FastFlags, or enable Super Performance Mode.</p>
+                    <p style="margin: 0;"><b>Note:</b> NVIDIA GPUs need 4GB+ VRAM to avoid this at higher texture settings.</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Sober doesn't launch (two lines of logs)</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> CPU doesn't support SSE4.2. This is a hard hardware requirement.</p>
+                    <p style="margin: 0;"><b>Fix:</b> Use a CPU from 2008+ (Intel) or 2013+ (AMD).</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">vkGetPhysicalDeviceSurfacePresentModesKHR failed</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> NVIDIA discrete GPU couldn't wake up.</p>
+                    <p style="margin: 0;"><b>Fix:</b> Click "Wake GPU" above, then try launching Sober again.</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">FFlags not applying</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> Roblox locked down FFlags to an official whitelist in September 2025.</p>
+                    <p style="margin: 0;"><b>Fix:</b> Only whitelisted flags will take effect. Check the <a href="https://devforum.roblox.com/t/developer-quick-start-guide-on-fast-flags-for-client-settings/2855075" target="_blank" style="color: var(--accent-color);">DevForum announcement</a>.</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">HiDPI not working</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> HiDPI scaling requires Wayland. X11 doesn't support it.</p>
+                    <p style="margin: 0;"><b>Fix:</b> Use a Wayland session for your desktop environment.</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Audio crackling</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Try switching the audio backend above. PipeWire or ALSA may resolve crackling issues.</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Can't join from browser / private server links</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> XDG portals not configured. Affects some DEs like Hyprland.</p>
+                    <p style="margin: 0;"><b>Fix:</b> Click "Fix Portals" above, or install <code>xdg-desktop-portal-gtk</code>.</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Pixelated outlines</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> This is a known issue from using the Android client. Cannot be fixed.</p>
+                  </div>
+                </details>
+                <details style="margin-bottom: 8px;">
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Low VRAM detection causing crashes</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Enable Super Performance Mode in FastFlags, or set Texture Quality to Level 0 (Potato).</p>
+                  </div>
+                </details>
+                <details>
+                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Sober can't detect graphics card</summary>
+                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
+                    <p style="margin: 0 0 6px 0;"><b>Causes:</b> Drivers installed from source, improper driver install, outdated drivers, Crostini GPU not enabled.</p>
+                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Install drivers from your distro package manager. Run <code>flatpak update</code>. On ChromeOS, enable <code>chrome://flags/#crostini-gpu-support</code>.</p>
+                    <p style="margin: 0;"><b>Alternative:</b> Try OpenGL in General Settings if Vulkan continues to fail.</p>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
         </main>
       </div>
-
-      <!-- Toast Container -->
-      <div id="toast-container"></div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
   </body>
 </html>

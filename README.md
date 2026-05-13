@@ -2,7 +2,7 @@
 
 linuxstrap is a lightweight, native Linux configuration utility designed specifically for [Sober](https://vinegarhq.org) (Roblox on Linux). Built with Tauri (Rust and Vanilla JS/HTML/CSS), linuxstrap provides a seamless libadwaita-themed interface to manage your Sober settings, FastFlags, and game modifications.
 
-Inspired by and integrating features from [Lution](https://github.com/Wookhq/Lution), [Silverr](https://github.com/Wookhq/silverr), [Fishtrap](https://github.com/fishstrap/fishstrap), and [Lucem](https://github.com/equinoxhq/lucem).
+Inspired by and integrating features from [Lution](https://github.com/Wookhq/Lution), [Silverr](https://github.com/Wookhq/silverr), [Fishtrap](https://github.com/fishstrap/fishstrap), [Lucem](https://github.com/equinoxhq/lucem), and [Tuxstrap](https://github.com/ocbwoy3/Tuxstrap).
 
 ## Features
 

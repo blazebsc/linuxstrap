@@ -20,7 +20,8 @@ pub fn extract_mod_zip(zip_path: &Path, overlay_dir: &Path) -> Result<(), String
         let components: Vec<_> = outpath.components().collect();
         for (idx, comp) in components.iter().enumerate() {
             let comp_str = comp.as_os_str().to_string_lossy().to_lowercase();
-            if comp_str == "extracontent" || comp_str == "platformcontent" || comp_str == "content" {
+            if comp_str == "extracontent" || comp_str == "platformcontent" || comp_str == "content"
+            {
                 // Keep the path from this component onwards
                 let mut relative_path = PathBuf::new();
                 for c in &components[idx..] {
@@ -44,4 +45,30 @@ pub fn extract_mod_zip(zip_path: &Path, overlay_dir: &Path) -> Result<(), String
         }
     }
     Ok(())
+}
+
+pub fn extract_fonts_from_zip(zip_path: &Path, font_dir: &Path) {
+    if let Ok(file) = fs::File::open(zip_path) {
+        if let Ok(mut archive) = ZipArchive::new(file) {
+            for i in 0..archive.len() {
+                if let Ok(mut zip_file) = archive.by_index(i) {
+                    if let Some(outpath) = zip_file.enclosed_name() {
+                        let path_str = outpath.to_string_lossy().to_lowercase();
+                        if path_str.ends_with(".ttf") || path_str.ends_with(".otf") || path_str.ends_with(".ttc") {
+                            if let Some(filename) = outpath.file_name() {
+                                let dest = font_dir.join(filename);
+                                if let Some(parent) = dest.parent() {
+                                    fs::create_dir_all(parent).ok();
+                                }
+                                let mut outfile = fs::File::create(&dest).ok();
+                                if let Some(ref mut out) = outfile {
+                                    io::copy(&mut zip_file, out).ok();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

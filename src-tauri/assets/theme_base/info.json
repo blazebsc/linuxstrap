@@ -1,0 +1,16 @@
+{
+  "LinuxstrapVersion": "$version",
+  "CreatedUsing": "linuxstrap",
+  "RobloxVersion": "$RobloxVersion",
+  "RobloxVersionHash": "$RobloxVersionHash",
+  "OptionsUsed": {
+    "ColorCursors": true,
+    "ColorShiftlock": true,
+    "ColorVoicechat": true,
+    "ColorEmoteWheel": true,
+    "GradientAngle": 0
+  },
+  "ColorsUsed": {
+    "SolidColor": "#FF0000"
+  }
+}
