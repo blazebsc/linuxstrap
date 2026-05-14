@@ -28,12 +28,15 @@ pub fn get_cache_dir() -> PathBuf {
 #[tauri::command]
 pub fn get_config() -> LinuxstrapConfig {
     let path = get_config_path();
+    eprintln!("[linuxstrap] Loading config from: {}", path.display());
 
     // First check: read from linuxstrap's own config
     let config: LinuxstrapConfig = if let Ok(content) = fs::read_to_string(&path) {
+        eprintln!("[linuxstrap] Found existing config, parsing...");
         serde_json::from_str(&content).unwrap_or_default()
     } else {
         // First run: import settings from Sober config
+        eprintln!("[linuxstrap] No config found, importing from Sober...");
         let sober_path = get_sober_config_path();
         let mut config = LinuxstrapConfig::default();
 
@@ -113,23 +116,78 @@ pub fn get_config() -> LinuxstrapConfig {
 
 #[tauri::command]
 pub fn save_config(app: tauri::AppHandle, config: LinuxstrapConfig) -> Result<(), String> {
+    eprintln!("[linuxstrap] Saving config...");
+
     let path = get_config_path();
+    let path_str = path.display().to_string();
     let content = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
-    fs::write(path, content).map_err(|e| e.to_string())?;
+    fs::write(&path, content).map_err(|e| e.to_string())?;
+    eprintln!("[linuxstrap] Config saved to {}", path_str);
 
     // Sync to Sober config and mods
+    eprintln!("[linuxstrap] Syncing to Sober config...");
     sync_to_sober_config(&config)?;
+    eprintln!("[linuxstrap] Syncing mods...");
     sync_mods(&app, &config)?;
+    eprintln!("[linuxstrap] Save complete.");
     Ok(())
 }
 
 #[tauri::command]
 pub fn launch_sober() -> Result<(), String> {
-    Command::new("sh")
-        .arg("-c")
-        .arg("nohup flatpak run org.vinegarhq.Sober > /dev/null 2>&1 &")
-        .spawn()
-        .map_err(|e| e.to_string())?;
+    eprintln!("[linuxstrap] Launching Sober...");
+
+    let config_path = get_config_path();
+    let config_content = fs::read_to_string(&config_path).unwrap_or_default();
+    let config: LinuxstrapConfig = serde_json::from_str(&config_content).unwrap_or_default();
+
+    eprintln!("[linuxstrap] Config loaded - renderer: {}, gpu: {}, gamemode: {}", 
+        config.renderer, config.selected_gpu, config.enable_gamemode);
+
+    let mut use_dri_prime = false;
+
+    if config.selected_gpu != "default" && !config.selected_gpu.is_empty() {
+        let gpu_lower = config.selected_gpu.to_lowercase();
+        if gpu_lower.contains("nvidia") || 
+           gpu_lower.contains("discrete") ||
+           gpu_lower.contains("gtx") ||
+           gpu_lower.contains("rtx") {
+            use_dri_prime = true;
+            eprintln!("[linuxstrap] Setting DRI_PRIME=1 for GPU: {}", config.selected_gpu);
+        }
+    }
+
+    if config.enable_gamemode {
+        if use_dri_prime {
+            Command::new("sh")
+                .arg("-c")
+                .arg("nohup DRI_PRIME=1 gamemoderun flatpak run org.vinegarhq.Sober > /dev/null 2>&1 &")
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        } else {
+            Command::new("sh")
+                .arg("-c")
+                .arg("nohup gamemoderun flatpak run org.vinegarhq.Sober > /dev/null 2>&1 &")
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        eprintln!("[linuxstrap] Launched with gamemode + DRI_PRIME={}", use_dri_prime);
+    } else {
+        if use_dri_prime {
+            Command::new("sh")
+                .arg("-c")
+                .arg("nohup DRI_PRIME=1 flatpak run org.vinegarhq.Sober > /dev/null 2>&1 &")
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        } else {
+            Command::new("sh")
+                .arg("-c")
+                .arg("nohup flatpak run org.vinegarhq.Sober > /dev/null 2>&1 &")
+                .spawn()
+                .map_err(|e| e.to_string())?;
+        }
+        eprintln!("[linuxstrap] Launched without gamemode, DRI_PRIME={}", use_dri_prime);
+    }
     Ok(())
 }
 
@@ -358,6 +416,8 @@ pub fn is_directory(path: String) -> bool {
 pub async fn generate_theme(app: tauri::AppHandle, color_hex: String) -> Result<usize, String> {
     use std::sync::atomic::{AtomicUsize, Ordering};
 
+    eprintln!("[linuxstrap] Generating theme with color: {}", color_hex);
+
     let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
     let base_dir = resource_dir.join("assets/theme_base");
 
@@ -366,11 +426,13 @@ pub async fn generate_theme(app: tauri::AppHandle, color_hex: String) -> Result<
     }
 
     let overlay_dir = get_sober_overlay_dir();
+    eprintln!("[linuxstrap] Overlay dir: {}", overlay_dir.display());
 
     let color = color_hex.trim_start_matches('#');
     let r = u8::from_str_radix(&color[0..2], 16).map_err(|_| "Invalid color")?;
     let g = u8::from_str_radix(&color[2..4], 16).map_err(|_| "Invalid color")?;
     let b = u8::from_str_radix(&color[4..6], 16).map_err(|_| "Invalid color")?;
+    eprintln!("[linuxstrap] RGB: {}, {}, {}", r, g, b);
 
     app.emit("theme_progress", serde_json::json!({ "status": "scanning", "progress": 0, "message": "Scanning files..." }))
         .ok();
@@ -384,6 +446,7 @@ pub async fn generate_theme(app: tauri::AppHandle, color_hex: String) -> Result<
             }
         }
     }
+    eprintln!("[linuxstrap] Found {} image files to process", total_files);
 
     let processed = std::sync::Arc::new(AtomicUsize::new(0));
     let processed_clone = processed.clone();
@@ -393,7 +456,9 @@ pub async fn generate_theme(app: tauri::AppHandle, color_hex: String) -> Result<
     let extra_dest = overlay_dir.join("ExtraContent");
 
     let _ = tokio::task::spawn_blocking(move || {
+        eprintln!("[linuxstrap] Processing content/ directory...");
         process_directory_with_progress(&base_dir.join("content"), &content_dest, r, g, b, total_files, &processed_clone, &app_clone)?;
+        eprintln!("[linuxstrap] Processing ExtraContent/ directory...");
         process_directory_with_progress(&base_dir.join("ExtraContent"), &extra_dest, r, g, b, total_files, &processed_clone, &app_clone)?;
         Ok::<(), String>(())
     }).await.map_err(|e| e.to_string())??;
@@ -473,10 +538,12 @@ fn process_directory_with_progress(
 
 #[tauri::command]
 pub fn kill_sober() -> Result<(), String> {
+    eprintln!("[linuxstrap] Killing Sober processes...");
     Command::new("flatpak")
         .args(["kill", "org.vinegarhq.Sober"])
         .output()
         .map_err(|e| e.to_string())?;
+    eprintln!("[linuxstrap] Kill command sent.");
     Ok(())
 }
 
@@ -731,4 +798,66 @@ fn write_buildericons_json(font_dir: &std::path::Path) -> Result<(), String> {
     std::fs::write(root.join("BuilderIcons.json"), json).map_err(|e| e.to_string())?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub fn get_gpus() -> Result<Vec<serde_json::Value>, String> {
+    let mut gpus: Vec<serde_json::Value> = Vec::new();
+
+    // Try lspci first - more reliable
+    let lspci_output = Command::new("sh")
+        .arg("-c")
+        .arg("lspci | grep -i 'vga\\|display' | sed 's/.*: //'")
+        .output();
+
+    if let Ok(out) = lspci_output {
+        let vga_output = String::from_utf8_lossy(&out.stdout);
+        for line in vga_output.lines() {
+            let name = line.trim();
+            if !name.is_empty() {
+                gpus.push(serde_json::json!({
+                    "id": name.to_string(),
+                    "name": name.to_string()
+                }));
+            }
+        }
+    }
+
+    // Try vulkaninfo as alternative
+    if gpus.is_empty() {
+        let vulkan_output = Command::new("sh")
+            .arg("-c")
+            .arg("vulkaninfo 2>/dev/null | grep -A5 'GPU[0-9]' | grep 'deviceName\\|deviceName' | head -5")
+            .output();
+
+        if let Ok(out) = vulkan_output {
+            let vk_output = String::from_utf8_lossy(&out.stdout);
+            for line in vk_output.lines() {
+                if let Some(name) = line.split(':').nth(1) {
+                    let name = name.trim().trim_start_matches('"').trim_end_matches('"');
+                    if !name.is_empty() {
+                        gpus.push(serde_json::json!({
+                            "id": name.to_string(),
+                            "name": name.to_string()
+                        }));
+                    }
+                }
+            }
+        }
+    }
+
+    // Always add default option
+    if gpus.is_empty() {
+        gpus.push(serde_json::json!({
+            "id": "default",
+            "name": "Default (System)"
+        }));
+    } else {
+        gpus.insert(0, serde_json::json!({
+            "id": "default",
+            "name": "Default (System)"
+        }));
+    }
+
+    Ok(gpus)
 }

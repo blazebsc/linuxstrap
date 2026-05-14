@@ -10,7 +10,7 @@ pub use commands::{
     get_config, get_system_fonts, generate_theme, import_fflags_json, launch_sober, launch_sober_config,
     open_mod_folder, save_config, validate_fflag, pick_file, pick_image, pick_folder, is_directory,
     recolor_fonts, kill_sober, check_sober_running, check_sse42, get_audio_driver, set_audio_driver,
-    wake_nvidia_gpu, setup_xdg_portal, reset_sober_config,
+    wake_nvidia_gpu, setup_xdg_portal, reset_sober_config, get_gpus,
 };
 pub use mods_api::{fetch_fishstrap_mods, fetch_gamebanana_mods, install_mod, uninstall_mod};
 
@@ -46,6 +46,7 @@ pub fn run() {
             wake_nvidia_gpu,
             setup_xdg_portal,
             reset_sober_config,
+            get_gpus,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -47,6 +47,7 @@ const btnResetSober = document.getElementById("btn-reset-sober");
 // Settings Elements
 const rpcSwitch = document.getElementById("setting-rpc");
 const rendererSelect = document.getElementById("setting-renderer");
+const gpuSelect = document.getElementById("setting-gpu");
 const closeOnLeaveSwitch = document.getElementById("setting-close-on-leave");
 const rpcJoinSwitch = document.getElementById("setting-rpc-join");
 const serverLocationSwitch = document.getElementById("setting-server-location");
@@ -110,6 +111,7 @@ async function loadConfig() {
     rpcSwitch.checked = config.discordRpc;
     rpcJoinSwitch.checked = config.discordRpcJoinButton;
     rendererSelect.value = config.renderer || "vulkan";
+    gpuSelect.value = config.selectedGpu || "default";
     closeOnLeaveSwitch.checked = config.closeOnLeave;
     serverLocationSwitch.checked = config.serverLocationIndicator;
     hidpiSwitch.checked = config.enableHidpi;
@@ -206,6 +208,24 @@ function updateVisibility() {
 // Event Listeners
 window.addEventListener("DOMContentLoaded", () => {
   loadConfig();
+
+  // Load GPUs
+  async function loadGpuOptions() {
+    try {
+      const gpus = await invoke("get_gpus");
+      gpuSelect.innerHTML = "";
+      gpus.forEach(gpu => {
+        const opt = document.createElement("option");
+        opt.value = gpu.id;
+        opt.textContent = gpu.name;
+        gpuSelect.appendChild(opt);
+      });
+      gpuSelect.value = config.selectedGpu || "default";
+    } catch (e) {
+      console.error("Failed to load GPUs:", e);
+    }
+  }
+  loadGpuOptions();
 
   // Sidebar Toggle
   document.getElementById("toggle-sidebar").addEventListener("click", () => {
@@ -348,6 +368,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   rendererSelect.addEventListener("change", (e) => {
     config.renderer = e.target.value;
+    saveConfig();
+  });
+
+  gpuSelect.addEventListener("change", (e) => {
+    config.selectedGpu = e.target.value;
     saveConfig();
   });
 
