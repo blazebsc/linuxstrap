@@ -50,7 +50,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ env.VERSION }}
-          name: Lucem v${{ env.VERSION }}
+          name: Linuxstrap v${{ env.VERSION }}
           body: 'Automated release of linuxstrap v${{ env.VERSION }}. See the changelog below.'
           draft: false
           prerelease: false
