@@ -69,8 +69,8 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-        files: |
-          src-tauri/target/release/bundle/deb/*.deb
-          src-tauri/target/release/bundle/appimage/*.AppImage
-          src-tauri/target/release/bundle/rpm/*.rpm
-          flatpak/linuxstrap_*_amd64.flatpak
+          files:
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/rpm/*.rpm
+            flatpak/linuxstrap_*_amd64.flatpak
