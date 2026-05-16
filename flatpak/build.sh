@@ -17,7 +17,7 @@ flatpak run --user org.flatpak.Builder build-dir org.linuxstrap.dev.yml
 
 # Export and create bundle
 mkdir -p repo
-flatpak build-export repo build-dir
-flatpak build-bundle repo "$FLATPAK_FILE" org.linuxstrap.dev
+flatpak --user build-export repo build-dir
+flatpak --user build-bundle repo "$FLATPAK_FILE" org.linuxstrap.dev
 
 echo "Done!"
