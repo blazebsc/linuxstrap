@@ -49,10 +49,12 @@ jobs:
 
       - name: Install Flatpak
         run: |
-          sudo apt-get install -y flatpak
-          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak --user install -y org.gnome.Platform//50 org.gnome.Sdk//50
-          flatpak --user install -y org.flatpak.Builder
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
+
+      - name: Install Flatpak runtime
+        run: |
+          flatpak install -y flathub org.gnome.Platform//50 org.gnome.Sdk//50
 
       - name: Build Flatpak
         run: |
