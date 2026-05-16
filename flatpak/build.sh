@@ -13,7 +13,7 @@ echo "Building Flatpak..."
 rm -rf build-dir .flatpak-builder
 
 # Build
-flatpak run --user org.flatpak.Builder build-dir org.linuxstrap.dev.yml
+flatpak-builder --force-clean build-dir org.linuxstrap.dev.yml
 
 # Export and create bundle
 mkdir -p repo
