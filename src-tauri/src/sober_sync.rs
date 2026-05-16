@@ -379,6 +379,24 @@ pub fn sync_to_sober_config(config: &LinuxstrapConfig) -> Result<(), String> {
                 );
                 fflags_obj.insert("DFIntConnectionMTUSize".to_string(), serde_json::json!(900));
                 fflags_obj.insert("FFlagEnableNewInput".to_string(), serde_json::json!(true));
+
+                // Voidstrap network optimizations
+                fflags_obj.insert("DFIntRccMaxPayloadSnd".to_string(), serde_json::json!(131072));
+                fflags_obj.insert("DFIntCliMaxPayloadRcv".to_string(), serde_json::json!(131072));
+                fflags_obj.insert("DFIntCliMaxPayloadSnd".to_string(), serde_json::json!(131072));
+                fflags_obj.insert("DFIntRccMaxPayloadRcv".to_string(), serde_json::json!(131072));
+                fflags_obj.insert("DFIntCliTcMaxPayloadRcv".to_string(), serde_json::json!(65536));
+                fflags_obj.insert("DFIntRccTcMaxPayloadRcv".to_string(), serde_json::json!(65536));
+                fflags_obj.insert("DFIntCliTcMaxPayloadSnd".to_string(), serde_json::json!(65536));
+                fflags_obj.insert("DFIntRccTcMaxPayloadSnd".to_string(), serde_json::json!(65536));
+
+                // Network buffering
+                fflags_obj.insert("DFIntBandwidthManagerApplicationDefaultBps".to_string(), serde_json::json!(10485760));
+                fflags_obj.insert("DFIntBandwidthManagerDataSenderMaxWorkCatchupMs".to_string(), serde_json::json!(20));
+
+                // Asset preloading
+                fflags_obj.insert("DFFlagEnableMeshPreloading2".to_string(), serde_json::json!(true));
+                fflags_obj.insert("DFIntNumAssetsMaxToPreload".to_string(), serde_json::json!(100));
             }
 
             // Tuxstrap Wayland Clipboard FFlags
@@ -390,6 +408,28 @@ pub fn sync_to_sober_config(config: &LinuxstrapConfig) -> Result<(), String> {
                 fflags_obj.insert("FFlagClientAllowDBus".to_string(), serde_json::json!(true));
                 fflags_obj.insert("FFlagIsLinux".to_string(), serde_json::json!(true));
             }
+
+            // Voidstrap Extra Rendering FFlags
+            // Remove grass for performance
+            fflags_obj.insert("FIntFRMMinGrassDistance".to_string(), serde_json::json!(0));
+            fflags_obj.insert("FIntFRMMaxGrassDistance".to_string(), serde_json::json!(0));
+            fflags_obj.insert("FIntRenderGrassDetailStrands".to_string(), serde_json::json!(0));
+
+            // Better visuals
+            fflags_obj.insert("FFlagRenderFixFog".to_string(), serde_json::json!(true));
+
+            // CPU threading optimizations
+            fflags_obj.insert("DFIntRuntimeConcurrency".to_string(), serde_json::json!(4));
+            fflags_obj.insert("DFIntInterpolationNumParallelTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("DFIntMegaReplicatorNumParallelTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("DFIntNetworkClusterPacketCacheNumParallelTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("DFIntReplicationDataCacheNumParallelTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("FIntLuaGcParallelMinMultiTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("FIntSmoothClusterTaskQueueMaxParallelTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("DFIntPhysicsReceiveNumParallelTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("FIntTaskSchedulerAutoThreadCount".to_string(), serde_json::json!(4));
+            fflags_obj.insert("FIntSimWorldTaskQueueParallelTasks".to_string(), serde_json::json!(4));
+            fflags_obj.insert("FIntTaskSchedulerAsyncTasksMinimumThreadCount".to_string(), serde_json::json!(4));
 
             // Custom FFlags
             for (key, val) in &config.custom_fflags {

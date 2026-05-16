@@ -224,28 +224,6 @@
 
               <div class="action-row">
                 <div class="row-info">
-                  <h3>GPU</h3>
-                  <p>Select which GPU to use for Roblox.</p>
-                </div>
-                <div class="row-action">
-                  <select id="setting-gpu" class="select-input" style="width: 200px;">
-                    <option value="default">Loading...</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="action-row">
-                <div class="row-info">
-                  <h3>Maximum FPS</h3>
-                  <p>If you have VSync enabled, this will be ignored.</p>
-                </div>
-                <div class="row-action">
-                  <input type="number" id="setting-maxfps" class="number-input" min="1" max="999" value="60">
-                </div>
-              </div>
-
-              <div class="action-row">
-                <div class="row-info">
                   <h3>Enable HiDPI Scaling</h3>
                   <p>Scale the rendering properly on high-resolution displays.</p>
                 </div>
@@ -453,14 +431,14 @@
               </div>
               <p class="description">Manage loaded patches for Sober.</p>
 
-              <div class="action-row">
+              <div class="action-row" style="opacity: 0.5;">
                 <div class="row-info">
                   <h3>Old Avatar Background</h3>
-                  <p>Restore the old 2014 mobile avatar background.</p>
+                  <p>Restore the old 2014 mobile avatar background. (Disabled - broken)</p>
                 </div>
                 <div class="row-action">
                   <label class="switch">
-                    <input type="checkbox" id="setting-old-avatar-bg">
+                    <input type="checkbox" id="setting-old-avatar-bg" disabled>
                     <span class="slider"></span>
                   </label>
                 </div>
@@ -565,16 +543,6 @@
 
               <div class="action-row">
                 <div class="row-info">
-                  <h3>Wake GPU (NVIDIA)</h3>
-                  <p>Runs <code>vkcube</code> to wake discrete GPU before launching.</p>
-                </div>
-                <div class="row-action">
-                  <button id="btn-wake-gpu" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;">Wake GPU</button>
-                </div>
-              </div>
-
-              <div class="action-row">
-                <div class="row-info">
                   <h3>Fix XDG Portals</h3>
                   <p>Fixes Roblox link joining on some desktop environments.</p>
                 </div>
@@ -628,79 +596,9 @@
 
               <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 20px 0;">
 
-              <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--text-secondary);">Common Issues</h3>
-
-              <div class="known-issues">
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Out of Memory (RBXCRASH)</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Problem:</b> Your GPU ran out of VRAM. Common on NVIDIA without shared VRAM spillover.</p>
-                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Set Texture Quality override to Level 1 or lower in FastFlags, or enable Super Performance Mode.</p>
-                    <p style="margin: 0;"><b>Note:</b> NVIDIA GPUs need 4GB+ VRAM to avoid this at higher texture settings.</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Sober doesn't launch (two lines of logs)</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> CPU doesn't support SSE4.2. This is a hard hardware requirement.</p>
-                    <p style="margin: 0;"><b>Fix:</b> Use a CPU from 2008+ (Intel) or 2013+ (AMD).</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">vkGetPhysicalDeviceSurfacePresentModesKHR failed</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> NVIDIA discrete GPU couldn't wake up.</p>
-                    <p style="margin: 0;"><b>Fix:</b> Click "Wake GPU" above, then try launching Sober again.</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">FFlags not applying</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> Roblox locked down FFlags to an official whitelist in September 2025.</p>
-                    <p style="margin: 0;"><b>Fix:</b> Only whitelisted flags will take effect. Check the <a href="https://devforum.roblox.com/t/developer-quick-start-guide-on-fast-flags-for-client-settings/2855075" target="_blank" style="color: var(--accent-color);">DevForum announcement</a>.</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">HiDPI not working</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> HiDPI scaling requires Wayland. X11 doesn't support it.</p>
-                    <p style="margin: 0;"><b>Fix:</b> Use a Wayland session for your desktop environment.</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Audio crackling</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Try switching the audio backend above. PipeWire or ALSA may resolve crackling issues.</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Can't join from browser / private server links</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> XDG portals not configured. Affects some DEs like Hyprland.</p>
-                    <p style="margin: 0;"><b>Fix:</b> Click "Fix Portals" above, or install <code>xdg-desktop-portal-gtk</code>.</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Pixelated outlines</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Cause:</b> This is a known issue from using the Android client. Cannot be fixed.</p>
-                  </div>
-                </details>
-                <details style="margin-bottom: 8px;">
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Low VRAM detection causing crashes</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Enable Super Performance Mode in FastFlags, or set Texture Quality to Level 0 (Potato).</p>
-                  </div>
-                </details>
-                <details>
-                  <summary style="cursor: pointer; font-size: 13px; padding: 6px 0;">Sober can't detect graphics card</summary>
-                  <div style="padding: 8px 12px; font-size: 12px; opacity: 0.7; line-height: 1.5;">
-                    <p style="margin: 0 0 6px 0;"><b>Causes:</b> Drivers installed from source, improper driver install, outdated drivers, Crostini GPU not enabled.</p>
-                    <p style="margin: 0 0 6px 0;"><b>Fix:</b> Install drivers from your distro package manager. Run <code>flatpak update</code>. On ChromeOS, enable <code>chrome://flags/#crostini-gpu-support</code>.</p>
-                    <p style="margin: 0;"><b>Alternative:</b> Try OpenGL in General Settings if Vulkan continues to fail.</p>
-                  </div>
-                </details>
-              </div>
+              <p style="font-size: 13px; color: var(--text-secondary);">
+                For more troubleshooting, visit the <a href="https://vinegarhq.org/Sober/Troubleshooting.html" target="_blank" style="color: var(--accent-color);">Vinegar Troubleshooting Guide</a>.
+              </p>
             </div>
           </div>
         </main>

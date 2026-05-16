@@ -16,7 +16,10 @@ pub fn sync_mods(app: &tauri::AppHandle, config: &LinuxstrapConfig) -> Result<()
     let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
     let assets_dir = resource_dir.join("assets");
 
-    // Old Avatar Background
+    // Old Avatar Background - DISABLED: was broken, caused fullscreen issues
+    // The proper way to do this would be to replace a specific texture, not a place file
+    // For now, this toggle does nothing
+    /*
     let bg_path = overlay_dir.join("ExtraContent/places/Mobile.rbxl");
     if config.use_old_avatar_background {
         if let Some(p) = bg_path.parent() {
@@ -28,7 +31,7 @@ pub fn sync_mods(app: &tauri::AppHandle, config: &LinuxstrapConfig) -> Result<()
             fs::remove_file(bg_path).ok();
         }
     }
-
+    */
     // Old Character Sounds
     let sound_dir = overlay_dir.join("content/sounds");
     let sounds = vec![

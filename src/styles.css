@@ -523,3 +523,38 @@ input[type="color"] {
   border-radius: 3px;
   font-size: 11px;
 }
+
+/* Active tab */
+.active-tab {
+  background: rgba(255,255,255,0.2) !important;
+}
+
+/* Mod cards */
+.mod-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-row);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.mod-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.mod-type {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.mod-size {
+  margin: 0;
+  font-size: 10px;
+  opacity: 0.5;
+}
+}

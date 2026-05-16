@@ -1,5 +1,4 @@
 use crate::config::LinuxstrapConfig;
-use crate::image_recolor::{recolor_image, walkdir};
 use crate::mods_sync::{get_sober_overlay_dir, sync_mods};
 use crate::sober_sync::{get_sober_config_path, sync_to_sober_config};
 use serde::Serialize;
@@ -414,126 +413,74 @@ pub fn is_directory(path: String) -> bool {
 
 #[tauri::command]
 pub async fn generate_theme(app: tauri::AppHandle, color_hex: String) -> Result<usize, String> {
-    use std::sync::atomic::{AtomicUsize, Ordering};
-
-    eprintln!("[linuxstrap] Generating theme with color: {}", color_hex);
+    eprintln!("[linuxstrap] Applying theme: {}", color_hex);
 
     let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
-    let base_dir = resource_dir.join("assets/theme_base");
+    
+    // Map colors to theme packs
+    let theme_zip = match color_hex.to_lowercase().trim_start_matches('#') {
+        "e74c3c" | "e74c3cff" => "red.zip",  // red
+        "3498db" | "3498dbff" => "blue.zip", // blue  
+        "2ecc71" | "2ecc71ff" => "green.zip", // green
+        "9b59b6" | "9b59b6ff" => "purple.zip", // purple
+        "e67e22" | "e67e22ff" => "orange.zip", // orange
+        "1abc9c" | "1abc9cff" => "teal.zip",   // teal
+        _ => "red.zip", // default
+    };
+    
+    let theme_path = resource_dir.join("assets/themes").join(theme_zip);
+    eprintln!("[linuxstrap] Theme pack: {}", theme_path.display());
 
-    if !base_dir.exists() {
-        return Err("Theme base files not found. Please reinstall linuxstrap.".to_string());
+    if !theme_path.exists() {
+        return Err(format!("Theme pack '{}' not found. Please reinstall linuxstrap.", theme_zip));
     }
 
     let overlay_dir = get_sober_overlay_dir();
-    eprintln!("[linuxstrap] Overlay dir: {}", overlay_dir.display());
+    eprintln!("[linuxstrap] Extracting to: {}", overlay_dir.display());
 
-    let color = color_hex.trim_start_matches('#');
-    let r = u8::from_str_radix(&color[0..2], 16).map_err(|_| "Invalid color")?;
-    let g = u8::from_str_radix(&color[2..4], 16).map_err(|_| "Invalid color")?;
-    let b = u8::from_str_radix(&color[4..6], 16).map_err(|_| "Invalid color")?;
-    eprintln!("[linuxstrap] RGB: {}, {}, {}", r, g, b);
-
-    app.emit("theme_progress", serde_json::json!({ "status": "scanning", "progress": 0, "message": "Scanning files..." }))
+    app.emit("theme_progress", serde_json::json!({ "status": "processing", "progress": 50, "message": "Extracting theme..." }))
         .ok();
 
-    let mut total_files = 0;
-    for entry in walkdir(&base_dir).unwrap_or_default() {
-        if let Some(ext) = entry.path().extension() {
-            let ext_lower = ext.to_string_lossy().to_lowercase();
-            if ext_lower == "png" || ext_lower == "jpg" || ext_lower == "jpeg" {
-                total_files += 1;
+    // Extract the zip file to overlay directory
+    let file = std::fs::File::open(&theme_zip).map_err(|e| e.to_string())?;
+    let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
+
+    let mut extracted_count = 0;
+    for i in 0..archive.len() {
+        let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
+        let outpath = overlay_dir.join(file.name());
+
+        if file.is_dir() {
+            std::fs::create_dir_all(&outpath).ok();
+        } else {
+            if let Some(p) = outpath.parent() {
+                std::fs::create_dir_all(p).ok();
             }
+            let mut outfile = std::fs::File::create(&outpath).map_err(|e| e.to_string())?;
+            std::io::copy(&mut file, &mut outfile).map_err(|e| e.to_string())?;
+            extracted_count += 1;
         }
     }
-    eprintln!("[linuxstrap] Found {} image files to process", total_files);
 
-    let processed = std::sync::Arc::new(AtomicUsize::new(0));
-    let processed_clone = processed.clone();
-    let app_clone = app.clone();
+    eprintln!("[linuxstrap] Extracted {} files", extracted_count);
 
-    let content_dest = overlay_dir.join("content");
-    let extra_dest = overlay_dir.join("ExtraContent");
-
-    let _ = tokio::task::spawn_blocking(move || {
-        eprintln!("[linuxstrap] Processing content/ directory...");
-        process_directory_with_progress(&base_dir.join("content"), &content_dest, r, g, b, total_files, &processed_clone, &app_clone)?;
-        eprintln!("[linuxstrap] Processing ExtraContent/ directory...");
-        process_directory_with_progress(&base_dir.join("ExtraContent"), &extra_dest, r, g, b, total_files, &processed_clone, &app_clone)?;
-        Ok::<(), String>(())
-    }).await.map_err(|e| e.to_string())??;
-
-    app.emit("theme_progress", serde_json::json!({ "status": "complete", "progress": 100, "message": "Done!" }))
-        .ok();
-
+    // Write info.json
     let info_path = overlay_dir.join("info.json");
     let info_json = serde_json::json!({
         "FroststrapVersion": env!("CARGO_PKG_VERSION"),
         "CreatedUsing": "linuxstrap",
-        "RobloxVersion": null,
-        "RobloxVersionHash": null,
-        "OptionsUsed": {
-            "ColorCursors": true,
-            "ColorShiftlock": true,
-            "ColorVoicechat": true,
-            "ColorEmoteWheel": true,
-            "GradientAngle": 0
-        },
+        "Theme": "red",
         "ColorsUsed": {
-            "SolidColor": format!("#{}", color.to_uppercase())
+            "SolidColor": "#e74c3c"
         }
     });
-
-    fs::write(&info_path, serde_json::to_string_pretty(&info_json).map_err(|e| e.to_string())?)
+    std::fs::write(&info_path, serde_json::to_string_pretty(&info_json).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
 
-    Ok(processed.load(Ordering::SeqCst))
-}
+    app.emit("theme_progress", serde_json::json!({ "status": "complete", "progress": 100, "message": "Theme applied! Restart Sober." }))
+        .ok();
 
-fn process_directory_with_progress(
-    source_dir: &std::path::Path,
-    dest_dir: &std::path::Path,
-    r: u8,
-    g: u8,
-    b: u8,
-    total_files: usize,
-    processed: &std::sync::Arc<std::sync::atomic::AtomicUsize>,
-    app: &tauri::AppHandle,
-) -> Result<(), String> {
-    std::fs::create_dir_all(dest_dir).map_err(|e| e.to_string())?;
-
-    let entries = walkdir(source_dir).map_err(|e| e.to_string())?;
-
-    for entry in entries {
-        let entry_path = entry.path();
-
-        if entry_path.is_file() {
-            if let Some(ext) = entry_path.extension() {
-                let ext_lower = ext.to_string_lossy().to_lowercase();
-                if ext_lower == "png" || ext_lower == "jpg" || ext_lower == "jpeg" {
-                    let relative = entry_path.strip_prefix(source_dir).unwrap();
-                    let dest_path = dest_dir.join(relative);
-
-                    if let Err(e) = recolor_image(&entry_path, &dest_path, r, g, b) {
-                        eprintln!("Failed to process {}: {}", entry_path.display(), e);
-                    }
-
-                    let current = processed.fetch_add(1, std::sync::atomic::Ordering::SeqCst) + 1;
-                    let progress = if total_files > 0 { (current * 100) / (total_files * 2) } else { 100 };
-
-                    app.emit("theme_progress", serde_json::json!({
-                        "status": "processing",
-                        "progress": progress.min(99),
-                        "current": current,
-                        "total": total_files * 2,
-                        "message": format!("Processing {}...", entry_path.file_name().unwrap_or_default().to_string_lossy())
-                    })).ok();
-                }
-            }
-        }
-    }
-
-    Ok(())
+    Ok(extracted_count)
 }
 
 #[tauri::command]
@@ -860,4 +807,78 @@ pub fn get_gpus() -> Result<Vec<serde_json::Value>, String> {
     }
 
     Ok(gpus)
+}
+
+#[tauri::command]
+pub fn get_playtime() -> Result<serde_json::Value, String> {
+    let output = Command::new("pgrep")
+        .args(["-f", "org.vinegarhq.Sober"])
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    let pid_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+
+    if pid_str.is_empty() {
+        return Ok(serde_json::json!({
+            "running": false,
+            "uptime_seconds": 0,
+            "uptime_formatted": "Not running"
+        }));
+    }
+
+    let pid: u32 = pid_str.parse().unwrap_or(0);
+    if pid == 0 {
+        return Ok(serde_json::json!({
+            "running": false,
+            "uptime_seconds": 0,
+            "uptime_formatted": "Not running"
+        }));
+    }
+
+    // Get process start time
+    let ps_output = Command::new("ps")
+        .args(["-o", "lstart=", "-p", &pid.to_string()])
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    let start_time_str = String::from_utf8_lossy(&ps_output.stdout).trim().to_string();
+
+    // Calculate uptime using /proc
+    let proc_path = format!("/proc/{}/stat", pid);
+    if let Ok(stat_content) = fs::read_to_string(&proc_path) {
+        if let Some(start_time) = stat_content.split(' ').nth(21) {
+            let start_ticks: u64 = start_time.parse().unwrap_or(0);
+            let uptime_ticks = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs() * 100 - start_ticks / 100;
+            let uptime_seconds = uptime_ticks as u64;
+
+            let hours = uptime_seconds / 3600;
+            let minutes = (uptime_seconds % 3600) / 60;
+            let seconds = uptime_seconds % 60;
+
+            let formatted = if hours > 0 {
+                format!("{}h {}m {}s", hours, minutes, seconds)
+            } else if minutes > 0 {
+                format!("{}m {}s", minutes, seconds)
+            } else {
+                format!("{}s", seconds)
+            };
+
+            return Ok(serde_json::json!({
+                "running": true,
+                "pid": pid,
+                "uptime_seconds": uptime_seconds,
+                "uptime_formatted": formatted
+            }));
+        }
+    }
+
+    Ok(serde_json::json!({
+        "running": true,
+        "pid": pid,
+        "uptime_seconds": 0,
+        "uptime_formatted": "Unknown"
+    }))
 }

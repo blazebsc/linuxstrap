@@ -1,0 +1,28 @@
+app-id: org.linuxstrap.dev
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+
+command: linuxstrap
+
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  - --share=network
+  - --filesystem=home
+  - --filesystem=host:ro
+  - --talk-name=org.freedesktop.Notifications
+
+modules:
+  - name: linuxstrap
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 linuxstrap /app/bin/linuxstrap
+      - install -Dm644 linuxstrap.svg /app/share/icons/hicolor/128x128/apps/org.linuxstrap.dev.png
+    sources:
+      - type: file
+        path: ../src-tauri/target/release/linuxstrap
+      - type: file
+        path: ../assets/linuxstrap.svg

@@ -25,3 +25,9 @@ dist-ssr
 
 # Zips
 *.zip
+
+# Flatpak
+flatpak/.flatpak-builder
+flatpak/build-dir
+flatpak/repo
+*.flatpak
