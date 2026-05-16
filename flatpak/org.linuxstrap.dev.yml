@@ -20,9 +20,18 @@ modules:
     buildsystem: simple
     build-commands:
       - install -Dm755 linuxstrap /app/bin/linuxstrap
-      - install -Dm644 linuxstrap.svg /app/share/icons/hicolor/128x128/apps/org.linuxstrap.dev.png
+      - install -Dm644 128x128.png /app/share/icons/hicolor/128x128/apps/org.linuxstrap.dev.png
+      - install -Dm644 128x128@2x.png /app/share/icons/hicolor/256x256/apps/org.linuxstrap.dev.png
+      - install -Dm644 32x32.png /app/share/icons/hicolor/32x32/apps/org.linuxstrap.dev.png
+      - install -Dm644 icon.png /app/share/icons/hicolor/512x512/apps/org.linuxstrap.dev.png
     sources:
       - type: file
         path: ../src-tauri/target/release/linuxstrap
       - type: file
-        path: ../assets/linuxstrap.svg
+        path: ../src-tauri/icons/128x128.png
+      - type: file
+        path: ../src-tauri/icons/128x128@2x.png
+      - type: file
+        path: ../src-tauri/icons/32x32.png
+      - type: file
+        path: ../src-tauri/icons/icon.png
